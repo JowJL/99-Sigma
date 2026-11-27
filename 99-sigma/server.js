@@ -5,7 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
-const MAX_PLAYERS = 6;
+const MAX_PLAYERS = 12;
 const HAND_SIZE = 4;
 const BUS_GOAL = 7;
 const LIMIT = 99;

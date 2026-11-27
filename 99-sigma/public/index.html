@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>99 sigma</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23F2A93B'/><text x='50' y='72' font-size='64' text-anchor='middle' font-family='Georgia' fill='%2324132B'>σ</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --night: #24132B;
+  --night-2: #301B39;
+  --night-3: #40284A;
+  --line: #57405F;
+  --text: #F6EEE4;
+  --muted: #B9A6BD;
+  --amber: #F2A93B;
+  --foam: #FFF3D6;
+  --card: #FBF5E9;
+  --ink: #1E1724;
+  --red: #C3343F;
+  --danger: #FF5A5F;
+  --ok: #7FD69A;
+  --font: "Bricolage Grotesque", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: inherit; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--night);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.hidden { display: none !important; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+
+/* Boutons */
+.btn {
+  border: 0; border-radius: 999px; padding: 12px 22px;
+  background: var(--amber); color: var(--ink); font-weight: 700;
+  transition: transform .08s ease, filter .15s ease;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 2px var(--line); }
+.btn.small { padding: 7px 14px; font-size: 15px; }
+.btn { white-space: nowrap; }
+
+/* Accueil */
+.home { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.home-inner { width: 100%; max-width: 440px; }
+.logo {
+  font-weight: 800; font-size: clamp(88px, 26vw, 150px); line-height: .82;
+  letter-spacing: -0.06em; margin: 0; color: var(--foam);
+  display: flex; align-items: baseline; gap: .04em;
+}
+.logo .sig { color: var(--amber); font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: .78em; }
+.tagline { color: var(--muted); margin: 14px 0 28px; max-width: 34ch; }
+.field { display: block; margin-bottom: 14px; }
+.field span { display: block; font-size: 15px; color: var(--muted); margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 13px 16px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--night-2); font-size: 18px;
+}
+.field input:focus { border-color: var(--amber); outline: none; }
+.home-actions { display: grid; gap: 10px; margin-top: 6px; }
+.join-row { display: flex; gap: 10px; }
+.join-row input { text-transform: uppercase; letter-spacing: .15em; flex: 1; min-width: 0; }
+.or { text-align: center; color: var(--muted); font-size: 15px; margin: 6px 0; }
+.error { color: var(--danger); min-height: 1.4em; margin-top: 12px; font-size: 15px; }
+
+/* Barre du haut */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 14px; }
+.brand { font-weight: 800; font-size: 26px; letter-spacing: -0.04em; color: var(--foam); }
+.brand .sig { color: var(--amber); font-family: Georgia, serif; font-weight: 400; }
+.tablecode { color: var(--muted); font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.tablecode b { color: var(--text); letter-spacing: .12em; }
+
+/* Joueurs */
+.players { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pl {
+  background: var(--night-2); border-radius: 14px; padding: 8px 12px 8px 12px;
+  display: flex; align-items: center; gap: 10px; border: 2px solid transparent; min-width: 0;
+}
+.pl.turn { border-color: var(--amber); background: var(--night-3); }
+.pl.off { opacity: .5; }
+.pl .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 12ch; }
+.pl .meta { font-size: 13px; color: var(--muted); }
+.backs { display: flex; }
+.backs i { width: 11px; height: 16px; border-radius: 3px; background: var(--amber); border: 1.5px solid var(--night-2); margin-left: -4px; }
+.backs i:first-child { margin-left: 0; }
+
+/* Le verre : le total */
+.board { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: stretch; }
+.glass {
+  position: relative; overflow: hidden; border-radius: 26px; background: var(--night-2);
+  min-height: 260px; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px 22px;
+}
+.beer {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 0%;
+  background: linear-gradient(180deg, var(--amber) 0%, #E0901F 100%);
+  transition: height .7s cubic-bezier(.3,1.2,.5,1), background .4s;
+}
+.beer::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 14px;
+  background: var(--foam); border-radius: 10px 10px 0 0; opacity: .95;
+}
+.glass.hot .beer { background: linear-gradient(180deg, #FF7A50 0%, var(--red) 100%); }
+.mark99 { position: absolute; top: 14px; right: 18px; font-size: 14px; color: var(--muted); z-index: 2; }
+.total {
+  position: relative; z-index: 2; font-weight: 800; font-size: clamp(96px, 22vw, 168px);
+  line-height: .85; letter-spacing: -0.05em; color: var(--foam);
+  text-shadow: 0 2px 0 rgba(36,19,43,.35);
+  font-variant-numeric: tabular-nums;
+}
+.total.bump { animation: bump .35s ease; }
+@keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.status { position: relative; z-index: 2; margin-top: 10px; font-size: 17px; color: var(--foam); }
+.side { display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; min-width: 120px; }
+.pilecap { font-size: 14px; color: var(--muted); text-align: center; }
+.dir { font-size: 15px; color: var(--muted); text-align: center; }
+
+/* Cartes */
+.card {
+  --w: 84px;
+  width: var(--w); height: calc(var(--w) * 1.4); border-radius: calc(var(--w) * .12);
+  background: var(--card); color: var(--ink); position: relative; flex: 0 0 auto;
+  box-shadow: 0 6px 0 rgba(0,0,0,.25); border: 0; padding: 0; text-align: left;
+  font-family: var(--font);
+}
+.card.red { color: var(--red); }
+.card .c-r { position: absolute; top: 7%; left: 10%; font-weight: 800; font-size: calc(var(--w) * .3); line-height: 1; }
+.card .c-s { position: absolute; top: 28%; left: 10%; font-size: calc(var(--w) * .2); line-height: 1; }
+.card .c-big { position: absolute; right: 9%; bottom: 5%; font-size: calc(var(--w) * .58); line-height: 1; }
+.card .c-fx {
+  position: absolute; left: 8%; bottom: 6%; font-size: calc(var(--w) * .13); font-weight: 600;
+  background: var(--ink); color: var(--card); border-radius: 6px; padding: 1px 5px;
+}
+.card.empty { background: transparent; box-shadow: inset 0 0 0 2px var(--line); }
+.card.back { background: repeating-linear-gradient(45deg, var(--amber) 0 6px, #E0901F 6px 12px); box-shadow: 0 6px 0 rgba(0,0,0,.25), inset 0 0 0 5px var(--card); }
+.card.back span { position: absolute; inset: 0; display: grid; place-items: center; font-family: Georgia, serif; font-size: calc(var(--w) * .45); color: var(--ink); }
+
+.hand-zone { margin-top: 22px; }
+.hand-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 10px; }
+.hand-head h2 { margin: 0; font-size: 19px; }
+.hint { color: var(--muted); font-size: 15px; }
+.hand { display: flex; gap: 12px; flex-wrap: wrap; }
+.hand .card { --w: 96px; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.hand.active .card:hover { transform: translateY(-8px); }
+.hand:not(.active) .card { cursor: default; filter: saturate(.7) brightness(.85); }
+.hand .card.lose { box-shadow: 0 6px 0 rgba(0,0,0,.25), 0 0 0 3px var(--danger); }
+.hand .card .warn { position: absolute; top: 6%; right: 8%; font-size: 12px; font-weight: 700; color: var(--danger); }
+
+/* Journal */
+.log { margin-top: 26px; font-size: 15px; color: var(--muted); }
+.log h3 { font-size: 15px; margin: 0 0 6px; color: var(--text); font-weight: 600; }
+.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.log li:first-child { color: var(--text); }
+
+/* Panneaux */
+.panel { background: var(--night-2); border-radius: 22px; padding: 22px; }
+.panel h2 { margin: 0 0 8px; font-size: 24px; letter-spacing: -0.02em; }
+.share { display: flex; gap: 8px; margin: 14px 0 6px; flex-wrap: wrap; }
+.share input { flex: 1; min-width: 0; padding: 11px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--night); font-size: 15px; }
+.lobby-list { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 6px; }
+.lobby-list li { display: flex; gap: 10px; align-items: center; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); }
+.dot.off { background: var(--line); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+details.rules { margin-top: 18px; color: var(--muted); font-size: 15px; }
+details.rules summary { cursor: pointer; color: var(--text); font-weight: 600; }
+details.rules dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 10px 0; }
+details.rules dt { color: var(--text); font-weight: 600; }
+details.rules dd { margin: 0; }
+
+/* Fin de partie */
+.loser-name { font-size: clamp(44px, 10vw, 72px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--amber); margin: 4px 0 8px; word-break: break-word; }
+
+/* Bus */
+.bus-track { display: flex; gap: 8px; margin: 14px 0 20px; }
+.bus-track i { flex: 1; height: 12px; border-radius: 6px; background: var(--night-3); transition: background .25s; }
+.bus-track i.on { background: var(--amber); }
+.bus-stage { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.bus-stage .card { --w: 120px; }
+.bus-stage .prev { --w: 76px; opacity: .55; }
+.bus-msg { font-size: 20px; font-weight: 600; min-height: 1.5em; margin-top: 14px; }
+.bus-msg.ok { color: var(--ok); }
+.bus-msg.ko { color: var(--danger); }
+.guesses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; max-width: 460px; }
+.guesses .btn { padding: 16px 8px; font-size: 18px; }
+
+/* Roi */
+dialog { border: 0; border-radius: 24px; background: var(--night-2); color: var(--text); padding: 24px; width: min(92vw, 380px); }
+dialog::backdrop { background: rgba(20, 8, 26, .7); }
+dialog h2 { margin: 0 0 4px; }
+.kv { font-size: 84px; font-weight: 800; letter-spacing: -0.05em; text-align: center; line-height: 1; margin: 14px 0 6px; color: var(--amber); font-variant-numeric: tabular-nums; }
+.kv-input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--night); font-size: 22px; text-align: center; }
+input[type=range] { width: 100%; accent-color: var(--amber); margin: 12px 0; }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--foam); color: var(--ink); padding: 10px 18px; border-radius: 999px; font-weight: 600;
+  z-index: 50; max-width: 90vw; text-align: center;
+}
+.conn { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); background: var(--red); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 14px; z-index: 40; }
+
+@media (max-width: 620px) {
+  .wrap { padding: 12px; }
+  .tlabel { display: none; }
+  .tablecode { gap: 6px; }
+  .brand { font-size: 22px; }
+  .board { grid-template-columns: 1fr; }
+  .side { flex-direction: row; justify-content: space-between; min-width: 0; }
+  .side .card { --w: 64px; }
+  .glass { min-height: 210px; }
+  .hand { gap: 8px; }
+  .hand .card { --w: calc((100vw - 24px - 24px) / 4); max-width: 96px; }
+  .bus-stage .card { --w: 104px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Accueil -->
+<main id="home" class="home hidden">
+  <div class="home-inner">
+    <h1 class="logo">99<span class="sig">σ</span></h1>
+    <p class="tagline">Posez vos cartes, faites monter le total. Celui qui atteint 99 a perdu.</p>
+    <label class="field"><span>Ton pseudo</span>
+      <input id="name" maxlength="16" autocomplete="nickname" placeholder="Ex. Léa">
+    </label>
+    <div class="home-actions">
+      <button class="btn" id="create">Créer une table</button>
+      <div class="or">ou rejoindre avec un code</div>
+      <div class="join-row field" style="margin:0">
+        <input id="code" maxlength="5" placeholder="CODE" autocomplete="off" aria-label="Code de la table">
+        <button class="btn ghost" id="join">Rejoindre</button>
+      </div>
+    </div>
+    <div class="error" id="home-error" role="alert"></div>
+  </div>
+</main>
+
+<!-- Table -->
+<div id="table" class="wrap hidden">
+  <header class="topbar">
+    <div class="brand">99<span class="sig">σ</span></div>
+    <div class="tablecode"><span class="tlabel">Table</span> <b id="tcode"></b>
+      <button class="btn ghost small" id="copy-top">Copier le lien</button>
+      <button class="btn ghost small" id="leave">Quitter</button>
+    </div>
+  </header>
+  <div id="view"></div>
+</div>
+
+<dialog id="king">
+  <h2>Roi : choisis le total</h2>
+  <div class="hint">Entre 1 et 98. Le total actuel est de <span id="k-now"></span>.</div>
+  <div class="kv" id="k-val">50</div>
+  <input type="range" id="k-range" min="1" max="98" value="50" aria-label="Valeur du total">
+  <div class="quick" id="k-quick"></div>
+  <div class="actions" style="justify-content:flex-end">
+    <button class="btn ghost" id="k-cancel">Annuler</button>
+    <button class="btn" id="k-ok">Poser le Roi</button>
+  </div>
+</dialog>
+
+<div id="conn" class="conn hidden">Connexion perdue, reconnexion…</div>
+<div id="toast" class="toast hidden" role="status"></div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const SUIT = { S: '♠', H: '♥', D: '♦', C: '♣' };
+  const RNAME = { A: 'As', J: 'Valet', Q: 'Dame', K: 'Roi' };
+  const RVAL = { A: 1, J: 11, Q: 12, K: 13 };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  let session = null;   // { code, token }
+  let state = null;
+  let es = null;
+  let pendingKing = null;
+  let lastTotal = null;
+  let leaving = false; // la page se recharge ou se ferme : on garde sa place
+  addEventListener('pagehide', () => { leaving = true; });
+  addEventListener('beforeunload', () => { leaving = true; });
+  addEventListener('pageshow', () => { leaving = false; });
+
+  // ---------- Stockage local (pseudo et place à la table) ----------
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} },
+  };
+  // La place à la table est gardée par onglet : deux onglets = deux joueurs
+  const seat = {
+    get(c) { try { return sessionStorage.getItem('99s:seat:' + c); } catch { return null; } },
+    set(c, t) { try { sessionStorage.setItem('99s:seat:' + c, t); } catch {} },
+    del(c) { try { sessionStorage.removeItem('99s:seat:' + c); } catch {} },
+  };
+
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => t.classList.add('hidden'), 2600);
+  }
+
+  async function api(path, body) {
+    const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({ error: 'Le serveur ne répond pas.' }));
+    if (!r.ok) throw new Error(j.error || 'Erreur.');
+    return j;
+  }
+  async function act(type, extra = {}) {
+    try { await api('/api/action', { code: session.code, token: session.token, type, ...extra }); }
+    catch (e) { toast(e.message); }
+  }
+
+  function tableLink(code) { return `${location.origin}/?table=${code}`; }
+
+  // ---------- Accueil ----------
+  function showHome(msg, code) {
+    if (es) { es.close(); es = null; }
+    session = null; state = null;
+    $('#table').classList.add('hidden');
+    $('#home').classList.remove('hidden');
+    $('#name').value = store.get('99s:name') || '';
+    if (code) $('#code').value = code;
+    $('#home-error').textContent = msg || '';
+    ($('#name').value ? (code ? $('#join') : $('#create')) : $('#name')).focus();
+  }
+  function getName() {
+    const n = $('#name').value.trim();
+    if (!n) { $('#home-error').textContent = 'Choisis d’abord un pseudo.'; $('#name').focus(); return null; }
+    store.set('99s:name', n);
+    return n;
+  }
+  $('#create').onclick = async () => {
+    const name = getName(); if (!name) return;
+    try { const r = await api('/api/create', { name }); enter(r.code, r.token); }
+    catch (e) { $('#home-error').textContent = e.message; }
+  };
+  async function doJoin() {
+    const name = getName(); if (!name) return;
+    const code = $('#code').value.trim().toUpperCase();
+    if (code.length !== 5) { $('#home-error').textContent = 'Le code fait 5 caractères.'; return; }
+    try { const r = await api('/api/join', { code, name }); enter(r.code, r.token); }
+    catch (e) { $('#home-error').textContent = e.message; }
+  }
+  $('#join').onclick = doJoin;
+  $('#code').addEventListener('keydown', (e) => { if (e.key === 'Enter') doJoin(); });
+  $('#name').addEventListener('keydown', (e) => { if (e.key === 'Enter') ($('#code').value.trim() ? doJoin() : $('#create').click()); });
+
+  // ---------- Connexion à la table ----------
+  function enter(code, token) {
+    session = { code, token };
+    seat.set(code, token);
+    history.replaceState(null, '', '/?table=' + code);
+    $('#home').classList.add('hidden');
+    $('#table').classList.remove('hidden');
+    $('#tcode').textContent = code;
+    connect();
+  }
+  function connect() {
+    if (es) es.close();
+    es = new EventSource(`/api/events?code=${session.code}&token=${session.token}`);
+    es.onmessage = (e) => { $('#conn').classList.add('hidden'); state = JSON.parse(e.data); render(); };
+    es.onerror = () => {
+      if (leaving) return;
+      if (es.readyState === EventSource.CLOSED) {
+        // La table n'existe plus (serveur redémarré) ou on a été retiré
+        const code = session && session.code;
+        seat.del(code);
+        showHome('Cette table n’existe plus. Crée-en une nouvelle.', '');
+      } else {
+        $('#conn').classList.remove('hidden');
+      }
+    };
+  }
+
+  async function copyLink() {
+    const link = tableLink(session.code);
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try { await navigator.share({ title: '99 sigma', text: 'Viens jouer au 99 avec nous', url: link }); return; } catch {}
+    }
+    try { await navigator.clipboard.writeText(link); toast('Lien copié'); }
+    catch { prompt('Copie ce lien :', link); }
+  }
+  $('#copy-top').onclick = copyLink;
+  $('#leave').onclick = async () => {
+    if (!confirm('Quitter la table ?')) return;
+    const code = session.code;
+    await act('leave');
+    seat.del(code);
+    history.replaceState(null, '', '/');
+    showHome('', '');
+  };
+
+  // ---------- Rendu ----------
+  const pname = (id) => { const p = state.players.find((x) => x.id === id); return p ? p.name : '?'; };
+
+  function cardHTML(c, opts = {}) {
+    const red = c.s === 'H' || c.s === 'D';
+    const fx = { J: '−10', Q: '⇄', K: 'au choix' }[c.r];
+    const tag = opts.button ? 'button' : 'div';
+    const label = `${RNAME[c.r] || c.r} de ${{ S: 'pique', H: 'cœur', D: 'carreau', C: 'trèfle' }[c.s]}`;
+    return `<${tag} class="card ${red ? 'red' : ''} ${opts.cls || ''}" data-id="${c.id}" aria-label="${label}${opts.extraLabel || ''}">
+      <span class="c-r">${c.r}</span><span class="c-s">${SUIT[c.s]}</span>
+      <span class="c-big">${SUIT[c.s]}</span>${fx ? `<span class="c-fx">${fx}</span>` : ''}${opts.warn ? '<span class="warn">99</span>' : ''}
+    </${tag}>`;
+  }
+
+  function playersHTML(highlightTurn) {
+    return `<div class="players">${state.players.filter((p) => p.seated).map((p) => `
+      <div class="pl ${highlightTurn && state.turn === p.id ? 'turn' : ''} ${p.connected ? '' : 'off'}">
+        <div>
+          <div class="nm">${esc(p.name)}${p.id === state.me.id ? ' (toi)' : ''}</div>
+          <div class="meta">${p.connected ? '' : 'déconnecté · '}${p.losses ? `${p.losses} défaite${p.losses > 1 ? 's' : ''}` : 'aucune défaite'}</div>
+        </div>
+        ${state.phase === 'playing' ? `<div class="backs" aria-label="${p.cards} cartes">${'<i></i>'.repeat(p.cards)}</div>` : ''}
+      </div>`).join('')}</div>`;
+  }
+
+  function rulesHTML() {
+    return `<details class="rules"><summary>Règles</summary>
+      <p>Chacun a 4 cartes et repioche après chaque carte posée. Le total part de 0 et chaque carte le modifie :</p>
+      <dl>
+        <dt>As à 10</dt><dd>ajoutent leur valeur (As = 1)</dd>
+        <dt>Valet</dt><dd>retire 10 au total (jamais sous 0)</dd>
+        <dt>Dame</dt><dd>ne change pas le total, inverse le sens du jeu</dd>
+        <dt>Roi</dt><dd>fixe le total à la valeur de ton choix, de 1 à 98</dd>
+      </dl>
+      <p>Celui qui fait atteindre 99 ou plus perd. Quand la pioche est vide, on finit avec ses cartes : si personne n’a atteint 99, le dernier à garder une carte perd.</p>
+      <p>Le bus : le perdant annonce si la carte suivante sera plus haute, plus basse ou de même valeur (As = 1, Roi = 13). Il lui faut 7 bonnes réponses d’affilée ; une erreur remet le compteur à zéro et on repart de la dernière carte.</p>
+    </details>`;
+  }
+
+  function logHTML() {
+    return `<div class="log"><h3>Derniers coups</h3><ol>${state.log.slice().reverse().slice(0, 6).map((l) => `<li>${esc(l.text)}</li>`).join('')}</ol></div>`;
+  }
+
+  function render() {
+    const v = $('#view');
+    const me = state.me;
+    const ph = state.phase;
+    if (ph === 'lobby') v.innerHTML = lobbyHTML();
+    else if (ph === 'playing') v.innerHTML = gameHTML();
+    else if (ph === 'over') v.innerHTML = overHTML();
+    else if (ph === 'bus') v.innerHTML = busHTML();
+    bind();
+    if (ph === 'playing' && lastTotal !== null && lastTotal !== state.total) {
+      const t = v.querySelector('.total');
+      if (t) { t.classList.remove('bump'); void t.offsetWidth; t.classList.add('bump'); }
+    }
+    lastTotal = ph === 'playing' ? state.total : null;
+    document.title = ph === 'playing' && state.turn === me.id ? '• À toi ! — 99 sigma' : '99 sigma';
+  }
+
+  function lobbyHTML() {
+    const me = state.me;
+    const seatedN = state.players.filter((p) => p.seated).length;
+    return `<section class="panel">
+      <h2>Salle d’attente</h2>
+      <p class="hint">Envoie ce lien à tes amis. Ils choisissent un pseudo et arrivent directement à cette table. De 2 à 6 joueurs.</p>
+      <div class="share"><input readonly value="${tableLink(state.code)}" aria-label="Lien de la table" onclick="this.select()"><button class="btn" data-a="copy">Copier le lien</button></div>
+      <ul class="lobby-list">${state.players.map((p) => `<li><span class="dot ${p.connected ? '' : 'off'}"></span>${esc(p.name)}${p.id === me.id ? ' (toi)' : ''}${p.seated ? '' : ' (spectateur)'}</li>`).join('')}</ul>
+      <div class="actions">
+        <button class="btn" data-a="start" ${seatedN < 2 || !me.seated ? 'disabled' : ''}>Lancer la partie</button>
+        ${seatedN < 2 ? '<span class="hint" style="align-self:center">En attente d’un deuxième joueur…</span>' : ''}
+      </div>
+      ${rulesHTML()}
+    </section>${logHTML()}`;
+  }
+
+  function statusText() {
+    const lp = state.lastPlay;
+    if (!lp) return `${esc(pname(state.turn))} commence.`;
+    let t = `${esc(pname(lp.by))} a posé ${RNAME[lp.card.r] || lp.card.r}`;
+    if (lp.card.r === 'K') t += ` et annoncé ${lp.kingValue}`;
+    if (lp.card.r === 'Q') t += ', le sens change';
+    return t + '.';
+  }
+
+  function gameHTML() {
+    const me = state.me;
+    const myTurn = state.turn === me.id;
+    const pct = Math.min(100, (state.total / 99) * 100);
+    const hot = state.total >= 80;
+    const lp = state.lastPlay;
+    const hand = me.hand.map((c) => {
+      const lose = c.r !== 'K' && c.r !== 'J' && c.r !== 'Q' && state.total + RVAL_NUM(c) >= 99;
+      return cardHTML(c, { button: true, cls: lose ? 'lose' : '', warn: lose, extraLabel: lose ? ', te ferait perdre' : '' });
+    }).join('');
+    const allLose = myTurn && me.hand.length && me.hand.every((c) => c.r !== 'K' && c.r !== 'J' && c.r !== 'Q' && state.total + RVAL_NUM(c) >= 99);
+    let hint = myTurn ? 'À toi de jouer : touche une carte.' : `${esc(pname(state.turn))} joue…`;
+    if (allLose) hint = 'Toutes tes cartes font atteindre 99. Il faut quand même en poser une.';
+    if (!me.seated) hint = 'Table pleine : tu regardes la partie.';
+    else if (me.hand.length === 0 && state.players.find((p) => p.id === me.id)) hint = state.deckCount === 0 ? 'Tu n’as plus de cartes, tu es tranquille pour cette partie.' : 'Tu rejoindras la prochaine partie.';
+    return `${playersHTML(true)}
+      <div class="board">
+        <div class="glass ${hot ? 'hot' : ''}" role="img" aria-label="Total ${state.total} sur 99">
+          <div class="beer" style="height:${pct}%"></div>
+          <div class="mark99">99 = perdu</div>
+          <div class="total">${state.total}</div>
+          <div class="status">${statusText()}</div>
+        </div>
+        <div class="side">
+          ${lp ? cardHTML(lp.card) : '<div class="card empty"></div>'}
+          <div>
+            ${state.deckCount ? '<div class="card back" style="--w:64px"><span>σ</span></div>' : '<div class="card empty" style="--w:64px"></div>'}
+            <div class="pilecap">${state.deckCount ? `${state.deckCount} dans la pioche` : 'Pioche vide'}</div>
+          </div>
+          <div class="dir">Sens ${state.direction === 1 ? '↻ horaire' : '↺ inverse'}</div>
+        </div>
+      </div>
+      <section class="hand-zone">
+        <div class="hand-head"><h2>Ta main</h2><span class="hint">${hint}</span></div>
+        <div class="hand ${myTurn ? 'active' : ''}" id="hand">${hand}</div>
+      </section>
+      <div class="actions" style="margin-top:20px"><button class="btn ghost small" data-a="abort">Arrêter la partie</button></div>
+      ${logHTML()}${rulesHTML()}`;
+  }
+  function RVAL_NUM(c) { return RVAL[c.r] || Number(c.r); }
+
+  function overHTML() {
+    const me = state.me;
+    const isLoser = state.loser === me.id;
+    const lp = state.lastPlay;
+    let why = '';
+    if (state.endReason === 'limit' && lp) why = `${RNAME[lp.card.r] || lp.card.r} posé, le total passe de ${lp.before} à ${lp.after}.`;
+    else if (state.endReason === 'lastCard') why = 'Pioche vide, dernier joueur avec une carte en main.';
+    const busDone = state.bus && state.bus.done && state.bus.playerId === state.loser;
+    return `${playersHTML(false)}
+      <section class="panel">
+        <div class="hint">Partie terminée</div>
+        <div class="loser-name">${isLoser ? 'Tu as perdu' : `${esc(pname(state.loser))} a perdu`}</div>
+        <p>${why}</p>
+        ${busDone ? `<p>${esc(pname(state.loser))} est sorti du bus.</p>` : ''}
+        <div class="actions">
+          ${isLoser && !busDone ? '<button class="btn" data-a="bus">Faire le bus</button>' : ''}
+          <button class="btn ${isLoser && !busDone ? 'ghost' : ''}" data-a="start" ${me.seated ? '' : 'disabled'}>${isLoser && !busDone ? 'Passer, nouvelle partie' : 'Nouvelle partie'}</button>
+        </div>
+      </section>${logHTML()}`;
+  }
+
+  function busHTML() {
+    const b = state.bus;
+    const me = state.me;
+    const mine = b.playerId === me.id;
+    const who = esc(pname(b.playerId));
+    const track = Array.from({ length: b.goal }, (_, i) => `<i class="${i < b.streak ? 'on' : ''}"></i>`).join('');
+    const word = { plus: 'plus', moins: 'moins', egal: 'même valeur' };
+    let msg = '', cls = '';
+    if (b.last) {
+      const n = RNAME[b.last.next.r] || b.last.next.r;
+      if (b.last.ok) { msg = `${n} : bonne réponse (${word[b.last.guess]}).`; cls = 'ok'; }
+      else { msg = `${n} : raté (« ${word[b.last.guess]} »). Retour à zéro.`; cls = 'ko'; }
+    }
+    if (b.done) { msg = `${mine ? 'Tu es sorti' : who + ' est sorti'} du bus en ${b.flips} cartes, avec ${b.errors} erreur${b.errors > 1 ? 's' : ''}.`; cls = 'ok'; }
+    return `<section class="panel">
+      <h2>${mine ? 'Ton bus' : `Le bus de ${who}`}</h2>
+      <p class="hint">7 bonnes réponses d’affilée pour sortir. As = 1, Roi = 13.</p>
+      <div class="bus-track" aria-label="${b.streak} sur ${b.goal}">${track}</div>
+      <div class="bus-stage">
+        ${b.last ? cardHTML(b.last.prev, { cls: 'prev' }) : ''}
+        ${cardHTML(b.current)}
+        <div>
+          <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1">${b.streak}/${b.goal}</div>
+          <div class="hint">${b.flips} carte${b.flips > 1 ? 's' : ''} retournée${b.flips > 1 ? 's' : ''}, ${b.errors} erreur${b.errors > 1 ? 's' : ''}</div>
+        </div>
+      </div>
+      <div class="bus-msg ${cls}" aria-live="polite">${msg}</div>
+      ${!b.done && mine ? `<div class="hint" style="margin-top:12px">La prochaine carte sera…</div>
+        <div class="guesses">
+          <button class="btn" data-g="plus">Plus</button>
+          <button class="btn ghost" data-g="egal">Même valeur</button>
+          <button class="btn" data-g="moins">Moins</button>
+        </div>` : ''}
+      ${!b.done && !mine ? `<p class="hint" style="margin-top:12px">${who} choisit…</p>` : ''}
+      <div class="actions" style="margin-top:20px">
+        ${b.done ? `<button class="btn" data-a="start" ${me.seated ? '' : 'disabled'}>Nouvelle partie</button>` : ''}
+        ${!b.done && mine ? '<button class="btn ghost small" data-a="leaveBus">Abandonner le bus</button>' : ''}
+      </div>
+    </section>${logHTML()}`;
+  }
+
+  function bind() {
+    document.querySelectorAll('[data-a]').forEach((b) => b.onclick = () => {
+      const a = b.dataset.a;
+      if (a === 'copy') return copyLink();
+      if (a === 'abort' && !confirm('Arrêter la partie pour tout le monde ?')) return;
+      if (a === 'leaveBus' && !confirm('Abandonner le bus ?')) return;
+      act(a);
+    });
+    document.querySelectorAll('[data-g]').forEach((b) => b.onclick = () => {
+      document.querySelectorAll('[data-g]').forEach((x) => x.disabled = true);
+      act('guess', { guess: b.dataset.g });
+    });
+    const hand = $('#hand');
+    if (hand) hand.querySelectorAll('.card').forEach((el) => el.onclick = () => {
+      if (state.turn !== state.me.id) return toast('Ce n’est pas ton tour.');
+      const c = state.me.hand.find((x) => x.id === el.dataset.id);
+      if (!c) return;
+      if (c.r === 'K') return openKing(c);
+      act('play', { card: c.id });
+    });
+  }
+
+  // ---------- Roi ----------
+  const dlg = $('#king');
+  function setK(v) {
+    v = Math.max(1, Math.min(98, Math.round(Number(v) || 1)));
+    $('#k-val').textContent = v; $('#k-range').value = v;
+  }
+  function openKing(c) {
+    pendingKing = c;
+    $('#k-now').textContent = state.total;
+    const quick = [1, 10, 50, 89, 98];
+    $('#k-quick').innerHTML = quick.map((q) => `<button class="btn ghost small" data-k="${q}">${q}</button>`).join('');
+    $('#k-quick').querySelectorAll('[data-k]').forEach((b) => b.onclick = () => setK(b.dataset.k));
+    setK(Math.max(1, Math.min(98, state.total || 50)));
+    dlg.showModal();
+  }
+  $('#k-range').oninput = (e) => setK(e.target.value);
+  $('#k-cancel').onclick = () => dlg.close();
+  $('#k-ok').onclick = () => {
+    dlg.close();
+    if (pendingKing) act('play', { card: pendingKing.id, kingValue: Number($('#k-range').value) });
+    pendingKing = null;
+  };
+  // Clavier : flèches pour ajuster la valeur du Roi
+  dlg.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { setK(+$('#k-range').value + 1); e.preventDefault(); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { setK(+$('#k-range').value - 1); e.preventDefault(); }
+  });
+
+  // ---------- Démarrage ----------
+  const params = new URLSearchParams(location.search);
+  const code = (params.get('table') || '').toUpperCase();
+  if (code) {
+    const token = seat.get(code);
+    if (token) enter(code, token);
+    else showHome('Choisis un pseudo pour rejoindre la table ' + code + '.', code);
+  } else showHome();
+})();
+</script>
+</body>
+</html>

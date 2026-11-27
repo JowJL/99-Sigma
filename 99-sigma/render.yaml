@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: 99-sigma
+    runtime: node
+    plan: free
+    buildCommand: "echo pas de dependance"
+    startCommand: node server.js
+    healthCheckPath: /health
